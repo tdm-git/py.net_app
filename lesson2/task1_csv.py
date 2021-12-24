@@ -1,31 +1,35 @@
+import re
 import csv
 
 
-def get_list_from_file(file_name:str, name_list:list):
-    result = []
-    with open(file_name, 'r', encoding='utf-8') as file:
-        for line in file:
-            line_list = line.split(sep=':')
-            if line_list[0] in name_list:
-                result.append(line_list[1].strip())
-    return result
+def get_data():
+    first_line = ['Изготовитель системы', 'Название ОС', 'Код продукта', 'Тип системы']
+    os_prod_list = []
+    os_name_list = []
+    os_code_list = []
+    os_type_list = []
+    for f_name in ('info_1.txt', 'info_2.txt', 'info_3.txt'):
+        file_obj = open(f_name, encoding='utf-8')
+        file_text = file_obj.read()
 
-def get_data(file_list, import_list):
-    result = []
-    result.append(import_list)
-    for i in file_list:
-        result.append(get_list_from_file(i, import_list))
-    return result
+        os_prod_reg = re.compile(r'Изготовитель системы:.*')
+        os_prod_list.append(os_prod_reg.findall(file_text)[0].split(sep=':')[1].strip())
+        os_name_reg = re.compile(r'Название ОС:.*')
+        os_name_list.append(os_name_reg.findall(file_text)[0].split(sep=':')[1].strip())
+        os_code_reg = re.compile(r'Код продукта:.*')
+        os_code_list.append(os_code_reg.findall(file_text)[0].split(sep=':')[1].strip())
+        os_type_reg = re.compile(r'Тип системы:.*')
+        os_type_list.append(os_type_reg.findall(file_text)[0].split(sep=':')[1].strip())
 
-def write_to_csv(file_name, file_list, import_list):
-    main_data = get_data(file_list, import_list)
-    with open('main_data.csv', 'w', encoding='utf-8') as file:
-        f_n_writer = csv.writer(file)
+    main_data = [first_line] + \
+                [[i,j,q,g,h] for i,j,q,g,h in zip(range(1,4), os_prod_list, os_name_list, os_code_list, os_type_list)]
+    return main_data
+
+def write_to_csv(out_file):
+    main_data = get_data()
+    with open(out_file, 'w', encoding='utf-8') as file:
+        writer = csv.writer(file)
         for row in main_data:
-            f_n_writer.writerow(row)
+            writer.writerow(row)
 
-
-file_list = ['info_1.txt', 'info_2.txt', 'info_3.txt']
-import_list = ['Изготовитель системы', 'Название ОС', 'Код продукта', 'Тип системы']
-
-write_to_csv('main_data.csv', file_list, import_list)
+write_to_csv('result.csv')
