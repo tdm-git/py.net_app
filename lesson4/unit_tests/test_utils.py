@@ -3,7 +3,8 @@ import json
 from common.settings import ENCODING, ACTION, PRESENCE, TIME, USER, ACCOUNT_NAME, RESPONSE, ERROR
 from common.utils import get_message, send_message
 
-class TestSocket:
+class TestSocketMsg:
+    # вспомогательный класс для кодирования\декодирования через него сообщений
     def __init__(self, test_dict):
         self.test_dict = test_dict
         self.encoded_message = None
@@ -26,15 +27,15 @@ class TestsUtils(unittest.TestCase):
     test_dict_recv_err = {RESPONSE: 400, ERROR: 'Bad Request'}
 
     def test_send_message(self):
-        test_socket = TestSocket(self.test_dict_send)
+        test_socket = TestSocketMsg(self.test_dict_send)
         send_message(test_socket, self.test_dict_send)
         self.assertEqual(test_socket.encoded_message, test_socket.receved_message)
         with self.assertRaises(Exception):
             send_message(test_socket, test_socket)
 
     def test_get_message(self):
-        test_sock_ok = TestSocket(self.test_dict_recv_ok)
-        test_sock_err = TestSocket(self.test_dict_recv_err)
+        test_sock_ok = TestSocketMsg(self.test_dict_recv_ok)
+        test_sock_err = TestSocketMsg(self.test_dict_recv_err)
         self.assertEqual(get_message(test_sock_ok), self.test_dict_recv_ok)
         self.assertEqual(get_message(test_sock_err), self.test_dict_recv_err)
 
